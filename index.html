@@ -1,0 +1,850 @@
+              } else {
+            return `
+              <div class="space-y-6 animate-fade-in">
+                <div class="text-cen<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>月影塔羅占卜 🔮</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes flip-in-3d {
+      from { opacity: 0; transform: perspective(1000px) rotateY(-90deg) scale(0.8); }
+      to { opacity: 1; transform: perspective(1000px) rotateY(0) scale(1); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+    @keyframes zoom-in {
+      from { opacity: 0; transform: scale(0.8) translateY(50px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes gradient {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .animate-fade-in { animation: fade-in 0.8s ease-out; }
+    .animate-flip-in-3d { animation: flip-in-3d 0.8s ease-out backwards; }
+    .animate-float { animation: float 4s ease-in-out infinite; }
+    .animate-spin-slow { animation: spin-slow 4s linear infinite; }
+    .animate-twinkle { animation: twinkle 2s ease-in-out infinite; }
+    .animate-zoom-in { animation: zoom-in 1.5s ease-out; }
+    .animate-gradient {
+      background-size: 200% auto;
+      animation: gradient 3s linear infinite;
+    }
+    .perspective-1000 { perspective: 1000px; }
+  </style>
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+  <div id="app"></div>
+
+  <script>
+    // 🎴 完整 78 張塔羅牌數據
+    const TAROT_DECK = {
+      major: [
+        { id: 0, name: '愚者', icon: '🚶', keywords: '新開始,冒險,純真,自由,信念之躍', upright: '代表新的開始、冒險精神和無限可能。你正站在人生新篇章的起點。', reversed: '警示魯莽行為、缺乏計劃或逃避責任。需要更謹慎地思考。' },
+        { id: 1, name: '魔術師', icon: '🎩', keywords: '創造力,技能,行動力,顯化,意志', upright: '你擁有實現目標所需的所有資源和能力。是時候將想法化為現實。', reversed: '可能存在操縱、欺騙或濫用才能的情況。需要誠實面對自己。' },
+        { id: 2, name: '女祭司', icon: '🌙', keywords: '直覺,神秘,內在智慧,潛意識', upright: '傾聽你的內在聲音。答案就在你的直覺之中,信任你的第六感。', reversed: '忽視直覺,過度理性分析。需要重新連接內在智慧。' },
+        { id: 3, name: '皇后', icon: '👑', keywords: '豐盛,母性,滋養,創造,自然', upright: '象徵豐盛與創造力的綻放。是收穫的時刻,也是孕育新事物的時期。', reversed: '創造力受阻,過度依賴或窒息式關愛。需要找回平衡。' },
+        { id: 4, name: '皇帝', icon: '⚔️', keywords: '權威,結構,穩定,領導,父性', upright: '建立秩序和穩定的時刻。運用你的權威和經驗來掌控局面。', reversed: '過度控制、僵化或濫用權力。需要更靈活的態度。' },
+        { id: 5, name: '教皇', icon: '🙏', keywords: '傳統,信仰,教導,精神指引', upright: '尋求傳統智慧和精神指引。向導師或信仰系統學習。', reversed: '挑戰傳統,尋找自己的道路。不要盲從既定規則。' },
+        { id: 6, name: '戀人', icon: '💕', keywords: '愛情,選擇,結合,和諧,價值觀', upright: '重要的選擇時刻,通常與關係或價值觀有關。跟隨你的心。', reversed: '關係失衡,價值觀衝突。需要重新評估你的選擇。' },
+        { id: 7, name: '戰車', icon: '🏇', keywords: '意志,勝利,前進,控制,決心', upright: '憑藉意志力和決心克服障礙。勝利在望,保持專注前進。', reversed: '失去方向或控制。可能需要重新調整策略。' },
+        { id: 8, name: '力量', icon: '🦁', keywords: '勇氣,耐心,內在力量,溫柔,馴服', upright: '真正的力量來自內在的勇氣和溫柔。以愛和耐心面對挑戰。', reversed: '自我懷疑,缺乏信心。需要重拾內在力量。' },
+        { id: 9, name: '隱者', icon: '🕯️', keywords: '內省,孤獨,智慧,尋找,指引', upright: '需要獨處和內省的時刻。在孤獨中尋找答案和智慧。', reversed: '過度孤立或拒絕尋求幫助。需要重新連接外界。' },
+        { id: 10, name: '命運之輪', icon: '☸️', keywords: '轉變,命運,循環,機會,變化', upright: '生命的轉折點。命運之輪正在轉動,帶來新的機會。', reversed: '壞運氣或不受歡迎的變化。記住一切都會過去。' },
+        { id: 11, name: '正義', icon: '⚖️', keywords: '公平,真相,法律,因果,平衡', upright: '真相將被揭示,公平的判決即將到來。因果循環正在運作。', reversed: '不公平對待,逃避責任。需要面對真相。' },
+        { id: 12, name: '倒吊人', icon: '🙃', keywords: '犧牲,放手,新視角,暫停,等待', upright: '從新的角度看問題。有時候放手和等待是必要的。', reversed: '無謂的犧牲或拒絕改變視角。停止抗拒。' },
+        { id: 13, name: '死神', icon: '💀', keywords: '結束,轉化,重生,釋放,蛻變', upright: '某個階段的結束,為新開始騰出空間。蛻變即將發生。', reversed: '抗拒改變,執著於過去。放手才能前進。' },
+        { id: 14, name: '節制', icon: '🧘', keywords: '平衡,調和,耐心,中庸,療癒', upright: '尋找平衡和調和。耐心和適度是關鍵。', reversed: '失衡,過度或極端行為。需要回歸中道。' },
+        { id: 15, name: '惡魔', icon: '😈', keywords: '束縛,誘惑,物質,執著,陰影', upright: '被物質慾望或不健康的關係束縛。是時候掙脫枷鎖。', reversed: '開始覺察並擺脫束縛。解放即將來臨。' },
+        { id: 16, name: '高塔', icon: '⚡', keywords: '突變,崩塌,啟示,破壞,解放', upright: '突如其來的變化打破舊結構。在混亂中找到解放。', reversed: '抗拒必要的改變。崩潰可能延遲但仍會發生。' },
+        { id: 17, name: '星星', icon: '⭐', keywords: '希望,靈感,寧靜,信念,療癒', upright: '希望和靈感的到來。相信宇宙的指引,療癒正在發生。', reversed: '失去信心和希望。需要重新點燃內在之光。' },
+        { id: 18, name: '月亮', icon: '🌕', keywords: '幻覺,恐懼,潛意識,直覺,不確定', upright: '事情並非表面所見。信任你的直覺,穿越幻象。', reversed: '恐懼和焦慮逐漸散去。真相開始浮現。' },
+        { id: 19, name: '太陽', icon: '☀️', keywords: '成功,喜悅,活力,光明,正面', upright: '成功和喜悅的時刻。一切都照亮了,享受這份光明。', reversed: '暫時的挫折,但陽光仍會到來。保持樂觀。' },
+        { id: 20, name: '審判', icon: '📯', keywords: '覺醒,救贖,呼喚,重生,反思', upright: '覺醒和更新的時刻。過去的行為將被評判,新生命開始。', reversed: '自我批判過度或拒絕反思。寬恕自己。' },
+        { id: 21, name: '世界', icon: '🌍', keywords: '完成,成就,整合,圓滿,旅程終點', upright: '一個循環的完成,目標達成。慶祝你的成就。', reversed: '未完成的事業,尚未達到目標。還需最後的努力。' }
+      ],
+      minor: {
+        wands: [
+          { name: '權杖王牌', icon: '🔥', keywords: '新計劃,靈感,創造力,機會', upright: '創意項目的絕佳開始。抓住這個充滿潛力的機會。', reversed: '缺乏方向或延遲的開始。重新點燃你的熱情。' },
+          { name: '權杖二', icon: '🌐', keywords: '計劃,決策,等待,個人力量', upright: '站在十字路口。你擁有力量,是時候做出選擇了。', reversed: '猶豫不決或計劃不周。需要更清晰的願景。' },
+          { name: '權杖三', icon: '⛵', keywords: '擴展,遠見,領導,前瞻', upright: '你的計劃開始展現成果。保持遠見和領導力。', reversed: '缺乏遠見或遇到阻礙。重新評估策略。' },
+          { name: '權杖四', icon: '🎉', keywords: '慶祝,和諧,穩定,家庭', upright: '慶祝里程碑和成就。享受這份和諧與穩定。', reversed: '缺乏支持或不穩定。需要重建基礎。' },
+          { name: '權杖五', icon: '⚔️', keywords: '衝突,競爭,張力,意見分歧', upright: '面臨競爭和衝突。保持專注於你的目標。', reversed: '衝突結束或避免對抗。尋求和平解決。' },
+          { name: '權杖六', icon: '🏆', keywords: '勝利,認可,進展,公眾認同', upright: '公開的成功和認可。你的努力得到回報。', reversed: '缺乏認可或自我懷疑。不要依賴外界肯定。' },
+          { name: '權杖七', icon: '🛡️', keywords: '挑戰,防禦,堅持,競爭', upright: '面對挑戰時保持立場。你有能力捍衛自己。', reversed: '放棄或被壓倒。可能需要戰略性撤退。' },
+          { name: '權杖八', icon: '✈️', keywords: '快速行動,進展,速度,旅程', upright: '事情快速發展。保持動力,目標就在眼前。', reversed: '延遲或倉促行事。需要調整節奏。' },
+          { name: '權杖九', icon: '🏔️', keywords: '韌性,堅持,防備,最後衝刺', upright: '接近終點但仍需堅持。展現你的韌性。', reversed: '精疲力竭或放棄。休息以恢復力量。' },
+          { name: '權杖十', icon: '📦', keywords: '負擔,壓力,責任,過度承擔', upright: '承擔太多責任。學會委派和尋求幫助。', reversed: '卸下負擔或拒絕承擔。設定界限。' },
+          { name: '權杖侍者', icon: '🎯', keywords: '熱情,探索,好消息,自由精神', upright: '充滿熱情的新消息或機會。保持好奇心。', reversed: '缺乏方向或壞消息。重新找到你的熱情。' },
+          { name: '權杖騎士', icon: '🐎', keywords: '行動,冒險,衝動,熱情追求', upright: '充滿活力地追求目標。行動勝於言語。', reversed: '魯莽或缺乏耐心。三思而後行。' },
+          { name: '權杖王后', icon: '🦋', keywords: '自信,獨立,魅力,熱情領導', upright: '展現你的自信和魅力。以熱情領導他人。', reversed: '缺乏自信或過度自我中心。找回平衡。' },
+          { name: '權杖國王', icon: '🦅', keywords: '願景,領導,企業家精神,榮譽', upright: '展現強大的領導力和遠見。你是天生的領袖。', reversed: '獨裁或濫用權力。更謙遜地領導。' }
+        ],
+        cups: [
+          { name: '聖杯王牌', icon: '💧', keywords: '新感情,愛,直覺,創意,情感覺醒', upright: '新的愛情或深刻的情感連結開始。敞開你的心。', reversed: '情感封閉或被拒絕。需要療癒內心。' },
+          { name: '聖杯二', icon: '💑', keywords: '夥伴關係,連結,吸引,平等', upright: '和諧的關係和相互連結。兩顆心合而為一。', reversed: '關係失衡或破裂。需要溝通和修復。' },
+          { name: '聖杯三', icon: '🥂', keywords: '慶祝,友誼,社群,喜悅', upright: '與朋友慶祝。社交連結帶來喜悅和滿足。', reversed: '社交孤立或友誼問題。重建連結。' },
+          { name: '聖杯四', icon: '🧘', keywords: '冷漠,沉思,重新評估,無聊', upright: '對現狀感到不滿。是時候重新評估你的情感需求。', reversed: '重新投入或看到新機會。走出沉思。' },
+          { name: '聖杯五', icon: '😢', keywords: '失落,悲傷,遺憾,失望', upright: '經歷失落和悲傷。允許自己哀悼,但記得轉身看到剩餘的杯子。', reversed: '接受失落並前進。療癒正在發生。' },
+          { name: '聖杯六', icon: '🎁', keywords: '懷舊,童年,回憶,純真', upright: '回顧過去帶來溫暖。童年記憶影響現在。', reversed: '活在過去或理想化記憶。活在當下。' },
+          { name: '聖杯七', icon: '☁️', keywords: '選擇,幻想,願望,困惑', upright: '面對眾多選擇和幻想。需要清晰度來做決定。', reversed: '做出決定或看清幻象。現實檢查。' },
+          { name: '聖杯八', icon: '🚶', keywords: '放手,離開,尋找更深意義', upright: '離開不再服務你的事物。尋找更深層的滿足。', reversed: '恐懼改變或徘徊不前。勇敢前進。' },
+          { name: '聖杯九', icon: '😌', keywords: '滿足,願望成真,情感幸福', upright: '願望之杯。情感滿足和夢想成真的時刻。', reversed: '不滿或貪婪。感恩你所擁有的。' },
+          { name: '聖杯十', icon: '🏡', keywords: '情感圓滿,幸福家庭,和諧,愛', upright: '完美的情感幸福。家庭和諧,愛充滿生活。', reversed: '家庭不和或破碎的關係。尋求療癒。' },
+          { name: '聖杯侍者', icon: '🐠', keywords: '創意消息,直覺,內在孩童,溫柔', upright: '來自內心的創意訊息。保持童真和好奇。', reversed: '情感不成熟或被壓抑的創造力。成長。' },
+          { name: '聖杯騎士', icon: '🦢', keywords: '浪漫,魅力,想像力,理想主義', upright: '浪漫的提議或創意追求。跟隨你的心和想像。', reversed: '不切實際或情緒化行為。腳踏實地。' },
+          { name: '聖杯王后', icon: '🌊', keywords: '同理心,關懷,直覺智慧,滋養', upright: '深刻的同理心和情感智慧。滋養自己和他人。', reversed: '情感依賴或過度敏感。建立界限。' },
+          { name: '聖杯國王', icon: '🐋', keywords: '情感成熟,外交,智慧,平衡', upright: '情感上的成熟和平衡。以智慧處理情感。', reversed: '情感操縱或冷漠。重新連接你的心。' }
+        ],
+        swords: [
+          { name: '寶劍王牌', icon: '🗡️', keywords: '突破,清晰,真相,心智力量', upright: '心智的突破和清晰時刻。真相被揭示。', reversed: '困惑或錯誤判斷。需要更多資訊。' },
+          { name: '寶劍二', icon: '⚖️', keywords: '困難決定,僵局,迴避,平衡', upright: '面對困難選擇。需要做出決定但兩難。', reversed: '決定做出或僵局打破。前進的時刻。' },
+          { name: '寶劍三', icon: '💔', keywords: '心痛,悲傷,痛苦,情感創傷', upright: '深刻的情感痛苦和心碎。允許自己悲傷。', reversed: '療癒開始,從痛苦中恢復。希望重現。' },
+          { name: '寶劍四', icon: '😴', keywords: '休息,恢復,沉思,靜養', upright: '需要休息和恢復。暫時撤退以重新充電。', reversed: '休息結束,準備重新投入。恢復活力。' },
+          { name: '寶劍五', icon: '⚔️', keywords: '衝突,失敗,背叛,自私', upright: '經歷衝突和可能的背叛。選擇你的戰鬥。', reversed: '衝突解決或放下怨恨。尋求和解。' },
+          { name: '寶劍六', icon: '⛵', keywords: '過渡,旅程,離開困境', upright: '從困難中過渡到平靜。旅程帶來療癒。', reversed: '無法前進或被困於過去。尋求支持。' },
+          { name: '寶劍七', icon: '🦊', keywords: '欺騙,策略,偷竊,逃避', upright: '可能涉及欺騙或不誠實。謹慎行事。', reversed: '真相揭露或良心發現。誠實面對。' },
+          { name: '寶劍八', icon: '🕸️', keywords: '限制,困住,無力感,受害', upright: '感到被困和無力。記住束縛可能是自我設限。', reversed: '解放自己,突破限制。自由即將到來。' },
+          { name: '寶劍九', icon: '😰', keywords: '焦慮,噩夢,恐懼,憂慮', upright: '被焦慮和恐懼困擾。尋求支持來面對。', reversed: '恐懼消退,希望出現。療癒正在進行。' },
+          { name: '寶劍十', icon: '⚰️', keywords: '結束,背叛,痛苦結局,崩潰', upright: '痛苦的結束和背叛。但這是黎明前的黑暗。', reversed: '恢復,最糟的已過去。重新開始。' },
+          { name: '寶劍侍者', icon: '🦅', keywords: '好奇,警覺,新想法,監視', upright: '保持警覺和好奇。新的想法和資訊到來。', reversed: '八卦或監視。小心你的言語。' },
+          { name: '寶劍騎士', icon: '⚡', keywords: '雄心,行動,衝動,直接', upright: '雄心勃勃地追求目標。快速而直接的行動。', reversed: '魯莽或攻擊性行為。放慢腳步思考。' },
+          { name: '寶劍王后', icon: '🦋', keywords: '獨立,清晰思維,真實,洞察', upright: '獨立思考,清晰判斷。說出你的真相。', reversed: '冷酷或過度批判。軟化你的邊緣。' },
+          { name: '寶劍國王', icon: '👨‍⚖️', keywords: '智慧,權威,真相,道德標準', upright: '運用智慧和邏輯做決定。堅守你的原則。', reversed: '濫用權力或過度理性。加入同理心。' }
+        ],
+        pentacles: [
+          { name: '錢幣王牌', icon: '💎', keywords: '新機會,繁榮,顯化,開始', upright: '財務或物質層面的新機會。種子已種下。', reversed: '錯失機會或財務挫折。重新規劃。' },
+          { name: '錢幣二', icon: '⚖️', keywords: '平衡,適應,彈性,優先順序', upright: '在多重責任中尋找平衡。保持彈性。', reversed: '失衡或過度承諾。需要重新排序。' },
+          { name: '錢幣三', icon: '🏗️', keywords: '團隊合作,技能,學習,協作', upright: '透過合作和學習達成目標。展現你的技能。', reversed: '缺乏團隊合作或技能不足。尋求指導。' },
+          { name: '錢幣四', icon: '💰', keywords: '安全,控制,保守,囤積', upright: '財務安全和穩定。但小心過度控制。', reversed: '貪婪或執著。學會放手和分享。' },
+          { name: '錢幣五', icon: '🥶', keywords: '困難,失落,貧困,孤立', upright: '經歷財務或健康困難。記住尋求幫助。', reversed: '困境改善,找到支持。恢復正在發生。' },
+          { name: '錢幣六', icon: '🤝', keywords: '慷慨,給予接受,分享,平衡', upright: '給予和接受的平衡。慷慨帶來回報。', reversed: '不平等交換或自私。重新平衡。' },
+          { name: '錢幣七', icon: '🌱', keywords: '耐心,投資,長期願景,等待', upright: '投資需要時間。保持耐心,收穫將至。', reversed: '缺乏耐心或努力不足。堅持下去。' },
+          { name: '錢幣八', icon: '🔨', keywords: '勤奮,技能發展,努力,學徒', upright: '透過努力和學習精進技能。專注工作。', reversed: '缺乏專注或完美主義。找到平衡。' },
+          { name: '錢幣九', icon: '🌺', keywords: '獨立,豐盛,自給自足,享受', upright: '享受你努力的成果。獨立和富足的時刻。', reversed: '過度工作或無法享受。放鬆一下。' },
+          { name: '錢幣十', icon: '🏛️', keywords: '財富,傳承,家族,長期成功', upright: '長期成功和財富。家族和傳承的重要性。', reversed: '財務損失或家族問題。重新建立基礎。' },
+          { name: '錢幣侍者', icon: '📚', keywords: '機會,學習,新計劃,野心', upright: '學習和成長的機會。新計劃帶來希望。', reversed: '缺乏進展或拖延。採取行動。' },
+          { name: '錢幣騎士', icon: '🐂', keywords: '責任,效率,實際,穩重', upright: '穩重可靠地追求目標。責任感強。', reversed: '停滯或過度謹慎。需要更多行動。' },
+          { name: '錢幣王后', icon: '🦌', keywords: '務實,舒適,安全,滋養', upright: '創造舒適和安全的環境。務實的關懷。', reversed: '物質主義或忽略自我照顧。找回平衡。' },
+          { name: '錢幣國王', icon: '🦁', keywords: '豐盛,成功,領導,穩定', upright: '財務成功和穩定的領導。享受你的成就。', reversed: '貪婪或工作狂。記住生活不只是工作。' }
+        ]
+      }
+    };
+
+    const SPREADS = [
+      { id: 'single', name: '單張指引', desc: '快速解答當下疑惑', count: 1, positions: ['核心訊息'] },
+      { id: 'three', name: '三牌陣', desc: '過去-現在-未來', count: 3, positions: ['過去', '現在', '未來'] },
+      { id: 'celtic', name: '凱爾特十字', desc: '深度全方位分析', count: 10, positions: ['現況', '挑戰', '根源', '過去', '可能性', '未來', '你的態度', '外在影響', '希望恐懼', '最終結果'] }
+    ];
+
+    const QUESTION_TYPES = [
+      { id: 'love', name: '愛情感情', desc: '戀愛、關係、婚姻', emoji: '💕' },
+      { id: 'career', name: '事業工作', desc: '職涯、工作、發展', emoji: '💼' },
+      { id: 'money', name: '財運金錢', desc: '財務、投資、收入', emoji: '💰' },
+      { id: 'health', name: '健康身心', desc: '身體、心理、療癒', emoji: '❤️' },
+      { id: 'relationship', name: '人際關係', desc: '友情、家庭、社交', emoji: '👥' },
+      { id: 'study', name: '學業考試', desc: '學習、考試、進修', emoji: '📚' },
+      { id: 'general', name: '一般指引', desc: '整體運勢、生活方向', emoji: '🔮' },
+      { id: 'other', name: '其他', desc: '其他各類問題', emoji: '❓' }
+    ];
+
+    // 狀態管理
+    let state = {
+      stage: 'entrance',
+      question: '',
+      questionType: null,
+      selectedSpread: null,
+      drawMode: null,
+      deck: [],
+      selectedCards: [],
+      drawnCards: [],
+      isDrawing: false,
+      aiReading: '',
+      isLoadingAI: false
+    };
+
+    // 創建完整牌組
+    function createFullDeck() {
+      const deck = [...TAROT_DECK.major];
+      Object.values(TAROT_DECK.minor).forEach(suit => {
+        suit.forEach((card, idx) => {
+          deck.push({ ...card, id: deck.length + idx });
+        });
+      });
+      return deck;
+    }
+
+    // AI API 調用
+    async function callAIForReading(cards) {
+      state.isLoadingAI = true;
+      render();
+
+      const cardDescriptions = cards.map((card, idx) => 
+        `位置 ${idx + 1}: ${card.position}\n` +
+        `牌名: ${card.name} ${card.icon}\n` +
+        `狀態: ${card.isReversed ? '逆位' : '正位'}\n` +
+        `關鍵字: ${card.keywords}\n` +
+        `基本含義: ${card.isReversed ? card.reversed : card.upright}`
+      ).join('\n\n');
+
+      const questionTypeDesc = QUESTION_TYPES.find(t => t.id === state.questionType);
+
+      const fullPrompt = `你是「月影」，一位擁有三十年經驗的專業塔羅解籤大師。
+
+請為以下問卜者進行深入而溫暖的塔羅解讀：
+
+問題類型：${questionTypeDesc.name}
+具體問題：${state.question}
+使用牌陣：${state.selectedSpread.name}
+
+抽到的牌：
+${cardDescriptions}
+
+請用以下方式進行解讀：
+1. 用優美的中文，自然分段
+2. 結合牌陣位置深入解讀每張牌
+3. 分析牌與牌之間的關聯
+4. 針對問題給出具體建議
+5. 以正面鼓勵作結
+6. 不要使用任何 Markdown 格式符號（不要用 **、##、*** 等）
+7. 字數約 400-600 字
+
+請直接開始解讀，不需要稱呼或開場白。`;
+
+      try {
+        const API_KEY = 'AIzaSyDp4g2JB3-MVMnCY27bHA6ql-0z2C3ZODc';
+        
+        console.log('🔮 開始調用 Gemini API...');
+        console.log('📝 問題:', state.question);
+        console.log('🎴 牌陣:', state.selectedSpread.name);
+        
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent?key=${API_KEY}`,
+          {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{ text: fullPrompt }]
+              }],
+              generationConfig: {
+                temperature: 0.9,
+                topK: 40,
+                topP: 0.95,
+                maxOutputTokens: 1500,
+              }
+            })
+          }
+        );
+
+        console.log('📡 收到 API 回應, status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ API 錯誤回應:', errorText);
+          throw new Error(`API 返回錯誤: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('📦 完整 API 回應:', JSON.stringify(data, null, 2));
+        
+        if (data.candidates && data.candidates[0]) {
+          const candidate = data.candidates[0];
+          
+          // 檢查是否被安全過濾器阻擋
+          if (candidate.finishReason === 'SAFETY') {
+            console.warn('⚠️ 內容被安全過濾器阻擋');
+            throw new Error('內容被安全過濾器阻擋');
+          }
+          
+          if (candidate.content && candidate.content.parts && candidate.content.parts[0]) {
+            let reading = candidate.content.parts[0].text;
+            
+            console.log('✅ AI 原始回應長度:', reading.length);
+            console.log('📄 AI 回應前 200 字:', reading.substring(0, 200));
+            
+            // 清理 Markdown 符號
+            reading = reading
+              .replace(/\*\*\*/g, '')
+              .replace(/\*\*/g, '')
+              .replace(/\*/g, '')
+              .replace(/###/g, '')
+              .replace(/##/g, '')
+              .replace(/#/g, '')
+              .replace(/^\s*[-•]\s*/gm, '')
+              .trim();
+            
+            state.aiReading = reading;
+            console.log('🎉 AI 解讀成功! 最終長度:', reading.length);
+          } else {
+            console.error('❌ 回應結構異常:', candidate);
+            throw new Error('AI 回應結構錯誤');
+          }
+        } else {
+          console.error('❌ 沒有候選回應:', data);
+          throw new Error('API 沒有返回有效回應');
+        }
+        
+      } catch (error) {
+        console.error('❌ AI 調用失敗:', error);
+        console.error('錯誤詳情:', error.message);
+        console.log('⚠️ 使用備用解讀');
+        state.aiReading = generateFallbackReading(cards);
+      }
+      
+      state.isLoadingAI = false;
+      render();
+    }
+
+    // 備用解讀
+    function generateFallbackReading(cards) {
+      const questionTypeDesc = QUESTION_TYPES.find(t => t.id === state.questionType);
+      
+      let reading = `親愛的問卜者,歡迎來到月影的占卜小屋。\n\n`;
+      reading += `關於你的${questionTypeDesc.name}問題:「${state.question}」\n\n`;
+      reading += `讓我們一起解讀命運為你準備的訊息。\n\n`;
+      
+      cards.forEach((card, idx) => {
+        reading += `${card.position} - ${card.name} ${card.icon} ${card.isReversed ? '(逆位)' : '(正位)'}\n\n`;
+        reading += `${card.isReversed ? card.reversed : card.upright}\n\n`;
+        reading += `關鍵啟示: ${card.keywords}\n\n`;
+      });
+      
+      reading += `整體建議\n\n`;
+      reading += `從這次的牌陣來看,宇宙正在為你指引方向。請記住,塔羅牌不是預言未來,而是照亮當下的明燈。相信你的直覺,按照內心的聲音行動,你會找到屬於自己的答案。\n\n`;
+      reading += `願星辰指引你的道路。`;
+      
+      return reading;
+    }
+
+    // 隨機抽牌
+    async function drawRandomCards() {
+      state.isDrawing = true;
+      render();
+      
+      const fullDeck = createFullDeck();
+      const shuffled = fullDeck.sort(() => Math.random() - 0.5);
+      const drawn = [];
+      
+      for (let i = 0; i < state.selectedSpread.count; i++) {
+        const card = shuffled[i];
+        const isReversed = Math.random() > 0.5;
+        drawn.push({
+          ...card,
+          isReversed,
+          position: state.selectedSpread.positions[i]
+        });
+      }
+      
+      state.drawnCards = drawn;
+      
+      await callAIForReading(drawn);
+      
+      setTimeout(() => {
+        state.isDrawing = false;
+        state.stage = 'result';
+        render();
+      }, 3000);
+    }
+
+    // 手動選牌確認
+    async function confirmManualSelection() {
+      state.isDrawing = true;
+      render();
+      
+      const drawn = state.selectedCards.map((cardIndex, i) => {
+        const card = state.deck[cardIndex];
+        const isReversed = Math.random() > 0.5;
+        return {
+          ...card,
+          isReversed,
+          position: state.selectedSpread.positions[i]
+        };
+      });
+      
+      state.drawnCards = drawn;
+      
+      await callAIForReading(drawn);
+      
+      setTimeout(() => {
+        state.isDrawing = false;
+        state.stage = 'result';
+        render();
+      }, 2000);
+    }
+
+    // 重置
+    function reset() {
+      state = {
+        stage: 'question',
+        question: '',
+        questionType: null,
+        selectedSpread: null,
+        drawMode: null,
+        deck: [],
+        selectedCards: [],
+        drawnCards: [],
+        isDrawing: false,
+        aiReading: '',
+        isLoadingAI: false
+      };
+      state.deck = createFullDeck().sort(() => Math.random() - 0.5);
+      render();
+    }
+
+    // 渲染函數
+    function render() {
+      const app = document.getElementById('app');
+      
+      if (state.stage === 'entrance') {
+        app.innerHTML = `
+          <div class="min-h-screen bg-black flex items-center justify-center overflow-hidden relative">
+            <div class="absolute inset-0">
+              ${Array(200).fill(0).map((_, i) => `
+                <div class="absolute bg-white rounded-full animate-twinkle" style="
+                  left: ${Math.random() * 100}%;
+                  top: ${Math.random() * 100}%;
+                  width: ${Math.random() * 2 + 1}px;
+                  height: ${Math.random() * 2 + 1}px;
+                  opacity: ${Math.random() * 0.7 + 0.3};
+                  animation-delay: ${Math.random() * 3}s;
+                "></div>
+              `).join('')}
+            </div>
+            <div class="relative z-10 text-center animate-zoom-in">
+              <div class="mb-12">
+                <div class="relative inline-block">
+                  <div class="w-32 h-32 text-9xl animate-float">🌙</div>
+                </div>
+              </div>
+              <h1 class="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 mb-6 font-serif animate-gradient">
+                月影塔羅占卜
+              </h1>
+              <p class="text-2xl text-purple-300 mb-4">歡迎來到神秘的占卜小屋</p>
+              <p class="text-purple-400 mb-12">在這裡,命運的答案將為你揭曉...</p>
+              <button onclick="startReading()" class="px-12 py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white text-xl font-semibold hover:scale-110 transition-all">
+                <span class="flex items-center gap-3">
+                  ✨ 踏入命運之門 ✨
+                </span>
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // 主占卜場景
+      app.innerHTML = `
+        <div class="min-h-screen bg-gradient-to-b from-indigo-950 via-purple-950 to-black text-white overflow-hidden relative">
+          <div class="fixed inset-0 overflow-hidden pointer-events-none opacity-50">
+            ${Array(150).fill(0).map(() => `
+              <div class="absolute bg-white rounded-full animate-twinkle" style="
+                left: ${Math.random() * 100}%;
+                top: ${Math.random() * 100}%;
+                width: ${Math.random() * 3}px;
+                height: ${Math.random() * 3}px;
+                animation-delay: ${Math.random() * 3}s;
+              "></div>
+            `).join('')}
+          </div>
+
+          <div class="relative z-10 container mx-auto px-4 py-8 max-w-6xl">
+            <div class="text-center mb-8">
+              <div class="inline-block relative animate-fade-in">
+                <div class="w-40 h-40 mx-auto mb-6 rounded-full bg-gradient-to-br from-purple-600 via-indigo-700 to-purple-800 flex items-center justify-center border-4 border-purple-400 shadow-2xl shadow-purple-500/50">
+                  <div class="text-8xl">👁️</div>
+                </div>
+                <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
+                  <div class="relative w-20 h-20 rounded-full bg-gradient-to-br from-cyan-300 via-blue-400 to-purple-500 animate-float shadow-2xl shadow-cyan-500/60 flex items-center justify-center">
+                    <div class="text-4xl animate-spin-slow">✨</div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 mt-12 font-serif">月影占卜師</h2>
+              <p class="text-purple-400 mt-2 text-lg">讓星辰為你指引方向</p>
+            </div>
+
+            <div class="relative bg-gradient-to-br from-purple-900/60 via-indigo-900/60 to-purple-900/60 backdrop-blur-md rounded-3xl p-8 border-2 border-purple-500/40 shadow-2xl">
+              ${renderStage()}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderStage() {
+      switch (state.stage) {
+        case 'question':
+          return `
+            <div class="space-y-6 animate-fade-in">
+              <div class="text-center mb-8">
+                <div class="text-6xl mb-4 animate-bounce">✨</div>
+                <h3 class="text-3xl font-bold text-purple-200 mb-3">請在心中默念你的問題</h3>
+                <p class="text-purple-400 text-lg">越具體的問題,命運的答案就越清晰</p>
+              </div>
+              <div class="relative">
+                <textarea
+                  id="questionInput"
+                  placeholder="在此輸入你想詢問的問題..."
+                  class="w-full h-40 bg-purple-950/70 border-2 border-purple-500/50 rounded-2xl p-6 text-white text-lg placeholder-purple-400/60 focus:outline-none focus:border-purple-400 resize-none"
+                  maxlength="200"
+                  oninput="updateCharCount(this)"
+                >${state.question}</textarea>
+                <div class="absolute bottom-4 right-4 text-sm text-purple-400/80">
+                  <span id="charCount">${state.question.length}</span>/200
+                </div>
+              </div>
+              <button
+                onclick="nextToType()"
+                class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-5 rounded-2xl text-xl font-semibold transition-all transform hover:scale-105 shadow-lg"
+              >
+                繼續 →
+              </button>
+            </div>
+          `;
+
+        case 'type':
+          return `
+            <div class="space-y-6 animate-fade-in">
+              <div class="text-center mb-8">
+                <h3 class="text-3xl font-bold text-purple-200 mb-3">這個問題屬於哪個領域?</h3>
+                <p class="text-purple-400 text-lg">選擇問題類型能讓解讀更精準</p>
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                ${QUESTION_TYPES.map(type => `
+                  <button
+                    onclick="selectType('${type.id}')"
+                    class="bg-gradient-to-br from-purple-800/50 to-indigo-900/50 hover:from-purple-700/60 hover:to-indigo-800/60 border-2 border-purple-500/30 hover:border-purple-400/60 rounded-2xl p-6 text-center transition-all transform hover:scale-105"
+                  >
+                    <div class="text-5xl mb-3">${type.emoji}</div>
+                    <div class="text-lg font-semibold text-purple-200 mb-1">${type.name}</div>
+                    <div class="text-sm text-purple-400">${type.desc}</div>
+                  </button>
+                `).join('')}
+              </div>
+              <button onclick="backToQuestion()" class="w-full bg-purple-800/50 hover:bg-purple-700/60 text-white py-4 rounded-2xl transition-all">
+                ← 返回修改問題
+              </button>
+            </div>
+          `;
+
+        case 'spread':
+          return `
+            <div class="space-y-6 animate-fade-in">
+              <div class="text-center mb-8">
+                <h3 class="text-3xl font-bold text-purple-200 mb-3">選擇你的牌陣</h3>
+                <p class="text-purple-400 text-lg">不同牌陣提供不同深度的洞察</p>
+              </div>
+              <div class="space-y-4">
+                ${SPREADS.map(spread => `
+                  <button
+                    onclick="selectSpread('${spread.id}')"
+                    class="w-full bg-gradient-to-r from-purple-900/50 to-indigo-900/50 hover:from-purple-800/60 hover:to-indigo-800/60 border-2 border-purple-500/30 hover:border-purple-400/60 rounded-2xl p-6 text-left transition-all transform hover:scale-105"
+                  >
+                    <div class="flex justify-between items-center">
+                      <div>
+                        <h4 class="text-2xl font-bold text-purple-200 mb-2">${spread.name}</h4>
+                        <p class="text-purple-300 mb-2">${spread.desc}</p>
+                        <p class="text-purple-400 text-sm">使用 ${spread.count} 張牌</p>
+                      </div>
+                      <div class="text-6xl">
+                        ${spread.id === 'single' ? '🎴' : spread.id === 'three' ? '🃏' : '✨'}
+                      </div>
+                    </div>
+                  </button>
+                `).join('')}
+              </div>
+              <button onclick="backToType()" class="w-full bg-purple-800/50 hover:bg-purple-700/60 text-white py-4 rounded-2xl transition-all">
+                ← 返回選擇類型
+              </button>
+            </div>
+          `;
+
+        case 'mode':
+          return `
+            <div class="space-y-6 animate-fade-in">
+              <div class="text-center mb-8">
+                <h3 class="text-3xl font-bold text-purple-200 mb-3">你想如何抽取塔羅牌?</h3>
+                <p class="text-purple-400 text-lg">跟隨你的直覺選擇</p>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <button
+                  onclick="selectMode('random')"
+                  class="bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-2xl p-10 transition-all transform hover:scale-105"
+                >
+                  <div class="text-8xl mb-6">🔀</div>
+                  <h4 class="text-2xl font-bold text-white mb-3">隨機抽取</h4>
+                  <p class="text-purple-200">讓命運為你選擇,快速直接的指引</p>
+                </button>
+                <button
+                  onclick="selectMode('manual')"
+                  class="bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-2xl p-10 transition-all transform hover:scale-105"
+                >
+                  <div class="text-8xl mb-6">✋</div>
+                  <h4 class="text-2xl font-bold text-white mb-3">親自選牌</h4>
+                  <p class="text-purple-200">用你的直覺選擇,更深的連結</p>
+                </button>
+              </div>
+              <button onclick="backToSpread()" class="w-full bg-purple-800/50 hover:bg-purple-700/60 text-white py-4 rounded-2xl transition-all">
+                ← 返回選擇牌陣
+              </button>
+            </div>
+          `;
+
+        case 'draw':
+          if (state.isDrawing) {
+            return `
+              <div class="text-center py-20 animate-fade-in">
+                <div class="relative inline-block mb-8">
+                  <div class="w-40 h-40 rounded-full bg-gradient-to-br from-cyan-300 via-blue-400 to-purple-500 animate-spin-slow shadow-2xl flex items-center justify-center">
+                    <div class="text-8xl">✨</div>
+                  </div>
+                </div>
+                <h3 class="text-3xl font-bold text-purple-200 mb-4">命運之輪正在轉動...</h3>
+                <p class="text-xl text-purple-400">${state.isLoadingAI ? '月影正在為你解讀命運...' : '正在為你抽取塔羅牌...'}</p>
+              </div>
+            `;
+          }
+          
+          if (state.drawMode === 'random') {
+            return `
+              <div class="text-center space-y-8 py-8 animate-fade-in">
+                <h3 class="text-3xl font-bold text-purple-200 mb-4">閉上眼睛,深呼吸...</h3>
+                <p class="text-purple-400 text-xl mb-12">當你準備好,點擊下方水晶球開始占卜</p>
+                <button onclick="drawRandomCards()" class="relative inline-block">
+                  <div class="w-56 h-56 mx-auto rounded-full bg-gradient-to-br from-cyan-300 via-blue-400 to-purple-500 shadow-2xl flex items-center justify-center transform hover:scale-110 transition-all cursor-pointer">
+                    <div class="text-9xl animate-spin-slow">✨</div>
+                  </div>
+                  <p class="text-purple-300 mt-8 text-xl font-semibold">點擊水晶球開始</p>
+                </button>
+              </div>
+            `;
+          } else {
+            return `
+              <div class="space-y-6 animate-fade-in">
+                <div class="text-center mb-8">
+                  <h3 class="text-3xl font-bold text-purple-200 mb-3">用直覺選擇 ${state.selectedSpread.count} 張牌</h3>
+                  <p class="text-xl text-purple-400 mb-2">
+                    已選擇: <span class="text-yellow-300 font-bold text-2xl">${state.selectedCards.length}</span> / ${state.selectedSpread.count}
+                  </p>
+                </div>
+                <div class="grid grid-cols-6 md:grid-cols-10 gap-3">
+                  ${state.deck.slice(0, 50).map((card, idx) => `
+                    <button
+                      onclick="toggleCard(${idx})"
+                      class="aspect-[2/3] rounded-xl transition-all duration-300 transform ${
+                        state.selectedCards.includes(idx)
+                          ? 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 scale-110 shadow-2xl border-2 border-yellow-300'
+                          : 'bg-gradient-to-br from-purple-700 via-indigo-800 to-purple-900 hover:scale-105 shadow-lg border-2 border-purple-500/50'
+                      } ${
+                        state.selectedCards.length >= state.selectedSpread.count && !state.selectedCards.includes(idx)
+                          ? 'opacity-30 cursor-not-allowed'
+                          : 'cursor-pointer'
+                      } flex items-center justify-center"
+                    >
+                      <div class="text-3xl">${state.selectedCards.includes(idx) ? '✨' : '🎴'}</div>
+                    </button>
+                  `).join('')}
+                </div>
+                ${state.selectedCards.length === state.selectedSpread.count ? `
+                  <button
+                    onclick="confirmManual()"
+                    class="w-full bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 hover:from-yellow-600 hover:via-orange-600 hover:to-red-600 text-white py-6 rounded-2xl text-xl font-bold transition-all transform hover:scale-105 shadow-2xl"
+                  >
+                    確認選擇,開始解讀 ✨
+                  </button>
+                ` : ''}
+              </div>
+            `;
+          }
+
+        case 'result':
+          return `
+            <div class="space-y-8 animate-fade-in">
+              <div class="text-center mb-8">
+                <div class="text-6xl mb-4">✨</div>
+                <h3 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 mb-3">
+                  你的塔羅解讀
+                </h3>
+                <p class="text-purple-400 text-xl">
+                  ${QUESTION_TYPES.find(t => t.id === state.questionType)?.emoji} ${QUESTION_TYPES.find(t => t.id === state.questionType)?.name}
+                </p>
+              </div>
+
+              <div class="grid gap-6 ${
+                state.drawnCards.length === 1 ? 'grid-cols-1 max-w-md mx-auto' :
+                state.drawnCards.length === 3 ? 'grid-cols-1 md:grid-cols-3' :
+                'grid-cols-2 md:grid-cols-5'
+              }">
+                ${state.drawnCards.map((card, idx) => `
+                  <div class="animate-flip-in-3d" style="animation-delay: ${idx * 0.2}s">
+                    <div class="bg-gradient-to-br from-purple-800 via-indigo-900 to-purple-900 rounded-2xl p-6 border-3 border-purple-400 shadow-2xl transform hover:scale-105 transition-all ${card.isReversed ? 'rotate-180' : ''}">
+                      <div class="${card.isReversed ? 'rotate-180' : ''}">
+                        <div class="text-6xl text-center mb-4">${card.icon}</div>
+                        <h4 class="text-xl font-bold text-purple-100 text-center mb-2">${card.name}</h4>
+                        <p class="text-center mb-2">
+                          <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold ${
+                            card.isReversed 
+                              ? 'bg-orange-500/30 text-orange-200 border border-orange-400/50' 
+                              : 'bg-green-500/30 text-green-200 border border-green-400/50'
+                          }">
+                            ${card.isReversed ? '逆位 ⬇️' : '正位 ⬆️'}
+                          </span>
+                        </p>
+                        <p class="text-purple-300 text-sm text-center font-semibold bg-purple-950/50 rounded-lg py-2 px-3">
+                          ${card.position}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+
+              <div class="relative mt-12">
+                <div class="flex items-center justify-center mb-8">
+                  <div class="h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent w-full"></div>
+                  <div class="text-4xl mx-4">✨</div>
+                  <div class="h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent w-full"></div>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-950/70 via-indigo-950/70 to-purple-950/70 backdrop-blur-sm rounded-2xl p-8 border-2 border-purple-500/40 shadow-xl">
+                  ${state.isLoadingAI ? `
+                    <div class="text-center py-12">
+                      <div class="relative inline-block mb-6">
+                        <div class="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin-slow"></div>
+                      </div>
+                      <p class="text-purple-300 text-xl">月影正在為你解讀...</p>
+                    </div>
+                  ` : `
+                    <div class="text-purple-100 leading-relaxed whitespace-pre-wrap text-lg">
+                      ${state.aiReading}
+                    </div>
+                  `}
+                </div>
+              </div>
+
+              <div class="flex flex-col md:flex-row gap-4 mt-8">
+                <button
+                  onclick="reset()"
+                  class="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-5 rounded-2xl text-xl font-semibold transition-all transform hover:scale-105 shadow-lg"
+                >
+                  ✨ 再次占卜
+                </button>
+                <button
+                  onclick="copyResult()"
+                  class="flex-1 bg-purple-800/60 hover:bg-purple-700/70 text-white py-5 rounded-2xl text-xl font-semibold transition-all transform hover:scale-105"
+                >
+                  📋 複製結果
+                </button>
+              </div>
+            </div>
+          `;
+
+        default:
+          return '';
+      }
+    }
+
+    // 事件處理函數
+    window.startReading = function() {
+      state.stage = 'question';
+      state.deck = createFullDeck().sort(() => Math.random() - 0.5);
+      render();
+    };
+
+    window.updateCharCount = function(textarea) {
+      state.question = textarea.value;
+      const charCount = document.getElementById('charCount');
+      if (charCount) {
+        charCount.textContent = textarea.value.length;
+      }
+    };
+
+    window.nextToType = function() {
+      const input = document.getElementById('questionInput');
+      if (input && input.value.trim()) {
+        state.question = input.value.trim();
+        state.stage = 'type';
+        render();
+      }
+    };
+
+    window.selectType = function(typeId) {
+      state.questionType = typeId;
+      state.stage = 'spread';
+      render();
+    };
+
+    window.selectSpread = function(spreadId) {
+      state.selectedSpread = SPREADS.find(s => s.id === spreadId);
+      state.stage = 'mode';
+      render();
+    };
+
+    window.selectMode = function(mode) {
+      state.drawMode = mode;
+      state.stage = 'draw';
+      render();
+    };
+
+    window.drawRandomCards = drawRandomCards;
+
+    window.toggleCard = function(idx) {
+      if (state.selectedCards.includes(idx)) {
+        state.selectedCards = state.selectedCards.filter(i => i !== idx);
+      } else if (state.selectedCards.length < state.selectedSpread.count) {
+        state.selectedCards.push(idx);
+      }
+      render();
+    };
+
+    window.confirmManual = confirmManualSelection;
+
+    window.backToQuestion = function() {
+      state.stage = 'question';
+      render();
+    };
+
+    window.backToType = function() {
+      state.stage = 'type';
+      render();
+    };
+
+    window.backToSpread = function() {
+      state.stage = 'spread';
+      render();
+    };
+
+    window.reset = reset;
+
+    window.copyResult = function() {
+      const text = `【月影塔羅占卜結果】\n\n問題: ${state.question}\n\n${state.aiReading}\n\n— 來自月影塔羅占卜 🔮`;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('✨ 已複製到剪貼簿!');
+      });
+    };
+
+    // 初始渲染
+    render();
+  </script>
+</body>
+</html>
